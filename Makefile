@@ -5,7 +5,7 @@
 ## Login   <gazzol_j@epitech.net>
 ## 
 ## Started on  Mon Mar  2 14:46:49 2015 julien gazzola
-## Last update Mon Mar  2 14:48:00 2015 julien gazzola
+## Last update Mon Mar  2 15:08:58 2015 julien gazzola
 ##
 
 Cc	=	gcc
@@ -16,7 +16,7 @@ NAME	=	lemipc
 
 SRC	=	init.c
 
-LDFLAGS	=	-lpthread -Wall -Wextra -Werror -pedantic -I. -ansi
+LDFLAGS	=	-Wall -Wextra -Werror -pedantic -I. -ansi
 
 OBJ	=	$(SRC:.c=.o)
 
