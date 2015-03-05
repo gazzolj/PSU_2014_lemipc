@@ -5,7 +5,7 @@
 ** Login   <gazzol_j@epitech.net>
 ** 
 ** Started on  Mon Mar  2 14:47:33 2015 julien gazzola
-** Last update Wed Mar  4 16:05:19 2015 julien gazzola
+** Last update Thu Mar  5 14:37:15 2015 Jordan Verove
 */
 
 #include <unistd.h>
@@ -17,60 +17,73 @@
 
 void	print_map(char *map)
 {
-  printf("%s\n", map);
+  int	i;
+
+  i = 0;
+  while (map[i] != '\0')
+    {
+      if (i != 0 && i % 10 == 0)
+	printf("\n");
+      printf("%c", map[i]);
+      i = i + 1;
+    }
+  printf("\n");
 }
 
-char	*init_map()
+char	*create_map(char *map)
 {
-  char	*map;
   int	i;
   int	j;
 
   i = 0;
   j = 0;
-  if ((map = malloc((11 * 10 * sizeof(char)) + 1)) == NULL)
-    return (NULL);
-  while (i != 110)
+  while (i != 100)
     {
-      if (j == 10)
-	{
-	  map[i] = '\n';
-	  j = 0;
-	}
-      else
-	{
-	  map[i] = '.';
-	  j = j + 1;
-	}
+      map[i] = '.';
       i = i + 1;
     }
   map[i] = '\0';
   return (map);
 }
 
-int	main()
+int	init_map(int shmid, char *map, key_t key)
+{
+  shmid = shmget(key, 100, IPC_CREAT | SHM_R | SHM_W);
+  if ((map = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
+    return (-1);
+  if ((map = create_map(map)) == NULL)
+    return (-1);
+  print_map(map);
+  //printf("voici la map\n%s\n", (char*)map);
+}
+
+int	init()
 {
   key_t	key;
-  char	*map;
   char	*my_pwd;
   int	shmid;
-  void	*mem;
+  char	*map;
 
-  if ((map = init_map()) == NULL)
-    return (-1);
   if ((my_pwd = getcwd(0, 0)) == NULL)
     return (-1);
   if ((key = (ftok(my_pwd, 0))) == -1)
     return (-1);
-  printf("%d\n", key);
-  if ((shmid = shmget(key, 110, SHM_R | SHM_W)) == -1)
-    shmid = shmget(key, 110, IPC_CREAT | SHM_R | SHM_W);
-  if ((mem = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
-    return (-1);
-  
-  sprintf((char *)mem, "salut");
-  printf("voici la map\n%s\n", (char*)mem);
-//  print_map(map);
-  shmctl(shmid, IPC_RMID, NULL);
+  if ((shmid = shmget(key, 100, SHM_R | SHM_W)) == -1)
+    {
+      if (init_map(shmid, map, key) == -1)
+	return (-1);
+    }
+  else
+    {
+      if ((map = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
+        return (-1);
+      print_map(map);
+      shmctl(shmid, IPC_RMID, NULL);
+    }
   return (0);
+}
+
+int	main(int ac, char **av)
+{
+  init();
 }
