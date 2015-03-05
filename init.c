@@ -5,9 +5,13 @@
 ** Login   <gazzol_j@epitech.net>
 ** 
 ** Started on  Mon Mar  2 14:47:33 2015 julien gazzola
-** Last update Wed Mar  4 14:15:28 2015 Jordan Verove
+** Last update Wed Mar  4 16:05:19 2015 julien gazzola
 */
 
+#include <unistd.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -48,9 +52,25 @@ int	main()
 {
   key_t	key;
   char	*map;
+  char	*my_pwd;
+  int	shmid;
+  void	*mem;
 
   if ((map = init_map()) == NULL)
     return (-1);
-  print_map(map);
+  if ((my_pwd = getcwd(0, 0)) == NULL)
+    return (-1);
+  if ((key = (ftok(my_pwd, 0))) == -1)
+    return (-1);
+  printf("%d\n", key);
+  if ((shmid = shmget(key, 110, SHM_R | SHM_W)) == -1)
+    shmid = shmget(key, 110, IPC_CREAT | SHM_R | SHM_W);
+  if ((mem = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
+    return (-1);
+  
+  sprintf((char *)mem, "salut");
+  printf("voici la map\n%s\n", (char*)mem);
+//  print_map(map);
+  shmctl(shmid, IPC_RMID, NULL);
   return (0);
 }
