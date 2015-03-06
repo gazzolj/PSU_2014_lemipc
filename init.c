@@ -5,7 +5,7 @@
 ** Login   <gazzol_j@epitech.net>
 ** 
 ** Started on  Mon Mar  2 14:47:33 2015 julien gazzola
-** Last update Fri Mar  6 10:31:48 2015 Jordan Verove
+** Last update Fri Mar  6 14:17:34 2015 Jordan Verove
 */
 
 #include <unistd.h>
@@ -20,6 +20,8 @@ void	print_map(char *map)
   int	i;
 
   i = 0;
+  //  system("clear");
+  printf("\n\n");
   while (map[i] != '\0')
     {
       if (i != 0 && i % 30 == 0)
