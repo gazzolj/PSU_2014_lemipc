@@ -5,16 +5,19 @@
 ## Login   <gazzol_j@epitech.net>
 ## 
 ## Started on  Mon Mar  2 14:46:49 2015 julien gazzola
-## Last update Mon Mar  2 15:08:58 2015 julien gazzola
+## Last update Fri Mar  6 09:39:23 2015 Jordan Verove
 ##
 
-Cc	=	gcc
+CC	=	gcc -g3
 
 RM	=	rm -f
 
 NAME	=	lemipc
 
-SRC	=	init.c
+SRC	=	init.c \
+		create_player.c \
+		action.c \
+		move.c
 
 LDFLAGS	=	-Wall -Wextra -Werror -pedantic -I. -ansi
 
