@@ -5,12 +5,14 @@
 ** Login   <verove_j@epitech.net>
 ** 
 ** Started on  Thu Mar  5 10:55:45 2015 Jordan Verove
-** Last update Fri Mar  6 15:19:07 2015 Jordan Verove
+** Last update Sat Mar  7 15:32:41 2015 Jordan Verove
 */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "lemipc.h"
 
 int		check_team_alive(char *map, char team)
 {
@@ -19,7 +21,7 @@ int		check_team_alive(char *map, char team)
   i = 0;
   while (map[i] != '\0')
     {
-      if (map[i] == (team + 48))
+      if (map[i] == team)
 	return (1);
       i = i + 1;
     }
@@ -46,12 +48,12 @@ int		create_random_player(char *map, char **arg1)
 
   if ((*arg1 = malloc(1 *sizeof(char))) == NULL)
     return (-1);
-  rand_value = rand() % 10;
+  rand_value = rand() % (57 - 48) + 48;
   *arg1[0] = rand_value;
   pos = rand() % 900;
   while (map[pos] != '.')
     pos = rand() % 900;
-  map[pos] = rand_value + 48;
+  map[pos] = rand_value;
   return (pos);
 }
 
@@ -60,7 +62,6 @@ int		check_number_player(char *map, char *arg1)
   int		number;
   int		pos;
 
-  print_map(map);
   if (arg1 != NULL)
     if ((number = atoi(arg1)) < 0 || (number = atoi(arg1)) > 9)
       return (-1);
@@ -72,10 +73,10 @@ int		check_number_player(char *map, char *arg1)
   else
     if ((pos = create_player(map, arg1)) == -1)
       return (-1);
-  // printf("arg[0] : %c\n", arg1[0] + 48);
   while (check_team_alive(map, arg1[0]) == 1)
     {
-      //      print_map(map);
-      pos = do_action(map, arg1[0], pos);
+      if ((pos = do_action(map, arg1[0], pos)) == -1)
+	return (-1);
+      sleep(1);
     }
 }

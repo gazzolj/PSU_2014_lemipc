@@ -5,7 +5,7 @@
 ** Login   <gazzol_j@epitech.net>
 ** 
 ** Started on  Mon Mar  2 14:47:33 2015 julien gazzola
-** Last update Fri Mar  6 14:17:34 2015 Jordan Verove
+** Last update Sat Mar  7 15:58:02 2015 Jordan Verove
 */
 
 #include <unistd.h>
@@ -15,13 +15,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "lemipc.h"
+
 void	print_map(char *map)
 {
   int	i;
 
   i = 0;
-  //  system("clear");
-  printf("\n\n");
+  system("clear");
   while (map[i] != '\0')
     {
       if (i != 0 && i % 30 == 0)
@@ -48,33 +49,26 @@ char	*create_map(char *map)
   return (map);
 }
 
-int	init_map(int shmid, char *map, key_t key)
+char	*init_map(int shmid, char *map, key_t key)
 {
   shmid = shmget(key, 900, IPC_CREAT | SHM_R | SHM_W);
   if ((map = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
-    return (-1);
+    return (NULL);
   if ((map = create_map(map)) == NULL)
-    return (-1);
-  print_map(map);
-  //printf("voici la map\n%s\n", (char*)map);
+    return (NULL);
+  return (map);
 }
 
-int	init_shared_memory(char *arg1)
+int	init_shared_memory(char *arg1, key_t key)
 {
-  key_t	key;
-  char	*my_pwd;
-  int	shmid;
   char	*map;
-
-  if ((my_pwd = getcwd(0, 0)) == NULL)
-    return (-1);
-  if ((key = (ftok(my_pwd, 0))) == -1)
-    return (-1);
+  int	shmid;
+  
   if ((shmid = shmget(key, 900, SHM_R | SHM_W)) == -1)
     {
-      if (init_map(shmid, map, key) == -1)
+      if ((map = init_map(shmid, map, key)) == NULL)
 	return (-1);
-      if (check_number_player(arg1) == -1)
+      if (check_number_player(map, arg1) == -1)
 	return (-1);
     }
   else
@@ -82,18 +76,31 @@ int	init_shared_memory(char *arg1)
       if ((map = shmat(shmid, NULL, SHM_R | SHM_W)) == (void*)-1)
         return (-1);
       if (check_number_player(map, arg1) == -1)
-	return (-1);
-      print_map(map);
-      //      shmctl(shmid, IPC_RMID, NULL);
+	{
+	  if (check_if_last(map) == 1)
+	    shmctl(shmid, IPC_RMID, NULL);
+	  return (-1);
+	}
     }
   return (0);
 }
 
 int	main(int ac, char **av)
 {
+  key_t	key;
+  char	*my_pwd;
+  
   srand(time(NULL));
+  if ((my_pwd = getcwd(0, 0)) == NULL)
+    return (-1);
+  if ((key = (ftok(my_pwd, 0))) == -1)
+    return (-1);
   if (ac == 1)
-    init_shared_memory(NULL);
+    {
+      if (init_shared_memory(NULL, key) == -1)
+	return (-1);
+    }
   else if (ac == 2)
-    init_shared_memory(av[1]);
+    if (init_shared_memory(av[1], key) == -1)
+      return (-1);
 }
